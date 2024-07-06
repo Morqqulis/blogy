@@ -2,49 +2,68 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
 import { Button } from '@ui/button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@ui/form'
 import { Input } from '@ui/input'
+import { Textarea } from '@ui/textarea'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import useMainStore from '../../stores/store'
-import { Textarea } from '@ui/textarea'
+import { Toaster } from './toaster'
+import { useToast } from './use-toast'
 
 export const formSchema = z.object({
   title: z.string().min(1, { message: 'Title is required' }),
-  img: z.string().min(1, { message: 'Image is required' }),
+  img: z.instanceof(File).refine((file) => file.size <= 5000000, 'Image must be less than 5MB'), // Validate file size
   desc: z.string().min(1, { message: 'Description is required' })
 })
 
 interface FormData {
   title: string
-  img: string
+  img: File | null
   desc: string
 }
 
 const EditForm: React.FC = (): JSX.Element => {
-  const addArticle = useMainStore((state) => state.addArticle)
+  const { addArticle, articles } = useMainStore()
+
+  const { toast } = useToast()
 
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors }
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
-      img: '',
+      img: null,
       desc: ''
     }
   })
 
   const onSubmit = (data: FormData) => {
-    const newArticle = {
-      id: Date.now(), // Уникальный ID
-      ...data
-    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      const base64Image = reader.result as string
 
-    addArticle(newArticle)
+      const newArticle = {
+        id: articles.length + 1,
+        title: data.title,
+        img: base64Image,
+        desc: data.desc
+      }
+
+      addArticle(newArticle)
+      toast({
+        description: 'Article added successfully',
+        title: 'Success'
+      })
+
+      reset()
+    }
+    reader.readAsDataURL(data.img as File)
   }
 
   return (
@@ -71,7 +90,12 @@ const EditForm: React.FC = (): JSX.Element => {
             <FormItem>
               <FormLabel htmlFor={field.name}>Image</FormLabel>
               <FormControl>
-                <Input id="img" placeholder="Image URL" type="text" {...field} />
+                <Input
+                  id="img"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => field.onChange(e.target.files ? e.target.files[0] : null)}
+                />
               </FormControl>
               <FormDescription>This is the image for the article</FormDescription>
               <FormMessage />
@@ -94,6 +118,7 @@ const EditForm: React.FC = (): JSX.Element => {
         />
         <Button type="submit">Submit</Button>
       </form>
+      <Toaster />
     </Form>
   )
 }
