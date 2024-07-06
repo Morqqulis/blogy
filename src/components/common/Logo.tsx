@@ -7,7 +7,7 @@ interface ILogo {
 
 const Logo: React.FC<ILogo> = ({ color = 'black', className }: ILogo): JSX.Element => {
   return (
-    <Link className={className} href="/">
+    <Link className={className} href="/" aria-label={'Link to homepage'}>
       <svg
         viewBox="0 0 395.831 37.532"
         fill="none"

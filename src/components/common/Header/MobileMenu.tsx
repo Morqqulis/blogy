@@ -9,7 +9,7 @@ const MobileMenu: React.FC = (): JSX.Element => {
   return (
     <div className={`block sm:hidden`}>
       <Sheet>
-        <SheetTrigger className={`flex flex-col items-center justify-center`}>
+        <SheetTrigger className={`flex flex-col items-center justify-center`} aria-label={'Open menu button'}>
           <Burger size={30} />
         </SheetTrigger>
         <SheetContent>
