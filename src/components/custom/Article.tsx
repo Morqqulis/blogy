@@ -1,4 +1,4 @@
-import { IArticles } from '@types/index'
+import { IArticles } from '@interfaces/index'
 import Image from 'next/image'
 import Link from 'next/link'
 

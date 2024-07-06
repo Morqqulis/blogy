@@ -1,6 +1,6 @@
 // store.ts
 import { articles as initialArticles } from '@data/index'
-import { IArticles } from '@types/index'
+import { IArticles } from '@interfaces/index'
 import { create } from 'zustand'
 
 interface IMainStore {

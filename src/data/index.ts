@@ -1,4 +1,4 @@
-import { IArticles } from '@types/index'
+import { IArticles } from '@interfaces/index'
 
 export const navigation = [
   {
